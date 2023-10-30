@@ -7,12 +7,12 @@ const elements = {
   select: document.querySelector('.breed-select'),
   info: document.querySelector('.cat-info'),
   loader: document.querySelector('.loader'),
-  // error: document.querySelector('.error'),
+  error: document.querySelector('.error'),
 };
 
 elements.select.classList.add('is-hidden');
 elements.info.classList.add('is-hidden');
-// elements.error.classList.add('is-hidden');
+/* elements.error.classList.add('is-hidden'); */
 
 fetchBreeds()
   .then(data => {
@@ -34,7 +34,7 @@ fetchBreeds()
   .catch(err => {
     Report.failure('Oops! ', `Something went wrong! Try reloading the page!`);
 
-    // elements.error.classList.remove('is-hidden');
+    elements.error.classList.remove('is-hidden');
     elements.select.classList.add('is-hidden');
     elements.info.classList.add('is-hidden');
     elements.loader.classList.add('is-hidden');
@@ -50,34 +50,41 @@ function handlerClick(e) {
       elements.info.classList.add('is-hidden');
 
       setTimeout(() => {
-        const [
-          {
+        // Check if 'breeds' property exists in data
+        if (data[0] && data[0].breeds) {
+          const {
             breeds: [
               {
                 name = 'Default cat',
                 temperament = 'Default temperament',
                 description = 'Default description',
               },
-            ] = [],
+            ],
             url = 'https://cdn2.thecatapi.com/images/OOD3VXAQn.jpg',
-          },
-        ] = data;
-        elements.info.innerHTML = `
-        
-        <div class='about-cat'> 
-        <img class="img-container" src="${url}" alt="${name}" width="300">
-        <h1>${name}</h1>
-             <p>${description}</p>
-             <p><b>Temperament:</b> ${temperament}</p>
-          </img>
-        </div>`;
+          } = data[0];
+
+          elements.info.innerHTML = `
+            <div class='about-cat'> 
+              <img class="img-container" src="${url}" alt="${name}" width="300">
+              <h1>${name}</h1>
+              <p>${description}</p>
+              <p><b>Temperament:</b> ${temperament}</p>
+            </div>`;
+        } else {
+          // Handle the case where 'breeds' property is missing
+          elements.info.innerHTML = `
+            <div class='about-cat'> 
+              <p>Error: Data is missing or in an unexpected format</p>
+            </div>`;
+        }
+
         elements.info.classList.remove('is-hidden');
         elements.loader.classList.add('is-hidden');
       }, 1000);
     })
     .catch(err => {
       Report.failure('Oops! ', `Something went wrong! Try reloading the page!`);
-      // elements.error.classList.remove('is-hidden');
+      elements.error.classList.remove('is-hidden');
       elements.info.classList.add('is-hidden');
       elements.loader.classList.add('is-hidden');
     });
